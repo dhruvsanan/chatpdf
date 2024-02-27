@@ -1,5 +1,4 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { db } from "@/db/index";
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf'
