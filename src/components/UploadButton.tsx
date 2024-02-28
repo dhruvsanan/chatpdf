@@ -71,11 +71,15 @@ const UploadDropzone = ({
         const res = await startUpload(acceptedFile)
 
         if (!res) {
+          clearInterval(progressInterval)
+          setUploadProgress(0)
+          setIsUploading(false)
           return toast({
-            title: 'Something went wrong',
-            description: 'Please try again later',
+            title: 'Smaller File Expected',
+            description: 'Please try with different file',
             variant: 'destructive',
-          })
+          });
+          
         }
 
         const [fileResponse] = res
@@ -151,7 +155,6 @@ const UploadDropzone = ({
                 {...getInputProps()}
                 type='file'
                 id='dropzone-file'
-                className='hidden'
               />
             </label>
           </div>

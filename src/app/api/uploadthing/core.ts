@@ -7,6 +7,7 @@ import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { getPineconeClient } from '@/lib/pinecone'
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 import { PLANS } from "@/config/stripe";
+import { UploadThingError } from "uploadthing/server";
 
 const f = createUploadthing();
  
@@ -53,6 +54,9 @@ const onUploadComplete = async ({
   try{
     const response= await fetch(file.url)
     const blob = await response.blob()
+    if (blob.size > 4 * 1024 * 1024) {
+      throw new UploadThingError("File size exceeds 4MB limit.");
+    }
 
     const loader = new PDFLoader(blob)
 
@@ -70,7 +74,9 @@ const onUploadComplete = async ({
       pagesAmt >
       PLANS.find((plan) => plan.name === 'Free')!
         .pagesPerPdf
-
+    console.log(isSubscribed)
+    console.log(isFreeExceeded)
+    console.log(isProExceeded)
     if (
       (isSubscribed && isProExceeded) ||
       (!isSubscribed && isFreeExceeded)
@@ -87,7 +93,7 @@ const onUploadComplete = async ({
 
     // vectorize and index entire document
     const pinecone = await getPineconeClient()
-    const pineconeIndex = pinecone.Index('quill')
+    const pineconeIndex = pinecone.Index('chatpdf')
 
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
