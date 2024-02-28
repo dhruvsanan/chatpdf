@@ -7,7 +7,6 @@ import { PineconeStore } from 'langchain/vectorstores/pinecone'
 import { getPineconeClient } from '@/lib/pinecone'
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 import { PLANS } from "@/config/stripe";
-import { UploadThingError } from "uploadthing/server";
 
 const f = createUploadthing();
  
@@ -54,9 +53,6 @@ const onUploadComplete = async ({
   try{
     const response= await fetch(file.url)
     const blob = await response.blob()
-    if (blob.size > 4 * 1024 * 1024) {
-      throw new UploadThingError("File size exceeds 4MB limit.");
-    }
 
     const loader = new PDFLoader(blob)
 
